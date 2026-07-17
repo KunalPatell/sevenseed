@@ -240,8 +240,11 @@ async function submitLogin(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
+    if (!res.ok) {
+      throw new Error("Backend offline or request failed (status " + res.status + ")");
+    }
     const data = await res.json();
-    if (res.ok && data.token) {
+    if (data.token) {
       localStorage.setItem('sevenforce_token', data.token);
       localStorage.removeItem('sevenforce_offline_mode');
       window.location.href = 'app.html';
@@ -280,8 +283,11 @@ async function submitSignup(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password })
     });
+    if (!res.ok) {
+      throw new Error("Backend offline or request failed (status " + res.status + ")");
+    }
     const data = await res.json();
-    if (res.ok && data.token) {
+    if (data.token) {
       localStorage.setItem('sevenforce_token', data.token);
       localStorage.removeItem('sevenforce_offline_mode');
       window.location.href = 'app.html';
