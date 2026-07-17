@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  if (!localStorage.getItem('sevenforce_token')) {
+    localStorage.setItem('sevenforce_token', 'demo_token');
+    localStorage.setItem('sevenforce_offline_mode', '1');
+    localStorage.setItem('sevenforce_offline_username', 'Demo User');
+  }
+</script>
 <title>Sevenforce — AI Workforce Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="style.css?v=1.0.3">
@@ -77,8 +84,8 @@
   
   <div class="user-profile-badge" id="user-profile">
     <span class="user-name" id="user-display-name">Loading...</span>
-    <button class="btn-logout" onclick="logoutUser()">
-      <i class="fas fa-sign-out-alt"></i> Logout
+    <button class="btn-logout" id="auth-action-btn" onclick="handleAuthAction()" style="margin-left: 8px;">
+      <i class="fas fa-sign-in-alt"></i> Sign In
     </button>
   </div>
 </header>
@@ -189,6 +196,28 @@ function collect(card){
 async function runTool(tool,card){
   const btn=card.querySelector(".run"), out=card.querySelector(".out"), bodyEl=card.querySelector(".body");
   const payload=collect(card);
+  
+  // Demo User Gate
+  const token = localStorage.getItem("sevenforce_token");
+  if (token === "demo_token") {
+    openAuthModal("login");
+    alert("To run this tool, please sign in first!");
+    return;
+  }
+  
+  // API Key Gate
+  const hasKey = localStorage.getItem("user_groq_key") || 
+                  localStorage.getItem("user_gemini_key") || 
+                  localStorage.getItem("user_openai_key") || 
+                  localStorage.getItem("user_serpapi_key") || 
+                  localStorage.getItem("user_huggingface_key") || 
+                  localStorage.getItem("user_mistral_key");
+  if (!hasKey) {
+    openSettingsModal();
+    alert("Please add your API Key in Settings to run this tool!");
+    return;
+  }
+
   btn.disabled=true; btn.textContent="Running..."; out.classList.add("show"); bodyEl.innerHTML=`<span class="note">Calling ${tool.ep} ...</span>`;
   
   const isOffline = localStorage.getItem("sevenforce_offline_mode") === "1";
@@ -383,6 +412,66 @@ async function health(){
   try{const r=await fetch("/api/health");const d=await r.json();$("#prov").innerHTML=`provider: <b>${esc(d.provider||'?')}</b>`;}
   catch(e){$("#prov").innerHTML=`<span class="err">backend offline</span>`;}
 }
+<!-- ── Auth Modal Popup ── -->
+<div id="auth-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
+    
+    <div class="auth-tabs">
+      <button id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">Log In</button>
+      <button id="tab-signup" class="auth-tab" onclick="switchAuthTab('signup')">Register</button>
+    </div>
+    
+    <!-- Login Panel -->
+    <div id="panel-login">
+      <h3>Access AI Workforce</h3>
+      <p class="subtitle">Log in to manage your AI employees, SEO tools, and analytics dashboards.</p>
+      
+      <div id="login-alert" class="alert-box error" style="display: none;"></div>
+      
+      <form id="form-login" onsubmit="submitLogin(event)">
+        <div class="fg-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="name@company.com">
+        </div>
+        <div class="fg-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+      </form>
+    </div>
+    
+    <!-- Signup Panel -->
+    <div id="panel-signup" style="display: none;">
+      <h3>Create Workspace Account</h3>
+      <p class="subtitle">Join Sevenforce to spin up brand, recruitment, and document agents.</p>
+      
+      <div id="signup-alert" class="alert-box error" style="display: none;"></div>
+      
+      <form id="form-signup" onsubmit="submitSignup(event)">
+        <div class="fg-group">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" required placeholder="E.g., Kunal Patel">
+        </div>
+        <div class="fg-group">
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" required placeholder="name@company.com">
+        </div>
+        <div class="fg-group">
+          <label for="signup-password">Password (6+ characters)</label>
+          <input type="password" id="signup-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i class="fas fa-user-plus"></i> Create Free Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- ── BYOK Settings Modal ── -->
 <div id="settings-modal" class="modal-overlay" style="display: none;">
   <div class="modal-card" style="max-width: 520px;">
@@ -430,11 +519,25 @@ async function health(){
   (async function() {
     const token = localStorage.getItem('sevenforce_token');
     const isOffline = localStorage.getItem('sevenforce_offline_mode') === '1';
+    const isDemo = token === 'demo_token';
     
     if (token) {
+      if (isDemo) {
+        document.getElementById('user-display-name').textContent = 'Demo User';
+        const actionBtn = document.getElementById('auth-action-btn');
+        actionBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        actionBtn.style.color = 'var(--cy)';
+        buildNav();
+        renderAgent();
+        health();
+        return;
+      }
       if (isOffline) {
         const mockName = localStorage.getItem('sevenforce_offline_username') || 'Preview User';
         document.getElementById('user-display-name').textContent = mockName + ' (Preview)';
+        const actionBtn = document.getElementById('auth-action-btn');
+        actionBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+        actionBtn.style.color = '#fca5a5';
         buildNav();
         renderAgent();
         health();
@@ -448,6 +551,9 @@ async function health(){
           const data = await res.json();
           if (data && data.user) {
             document.getElementById('user-display-name').textContent = data.user.name;
+            const actionBtn = document.getElementById('auth-action-btn');
+            actionBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            actionBtn.style.color = '#fca5a5';
             buildNav();
             renderAgent();
             health();
@@ -457,10 +563,41 @@ async function health(){
       } catch (e) {}
     }
     // Fallback if token check failed
-    localStorage.removeItem('sevenforce_token');
-    localStorage.removeItem('sevenforce_offline_mode');
-    window.location.href = 'index.html';
+    localStorage.setItem('sevenforce_token', 'demo_token');
+    localStorage.setItem('sevenforce_offline_mode', '1');
+    localStorage.setItem('sevenforce_offline_username', 'Demo User');
+    window.location.reload();
   })();
+
+  // Auth Action Trigger (Login / Logout)
+  function handleAuthAction() {
+    const token = localStorage.getItem('sevenforce_token');
+    if (token === 'demo_token') {
+      openAuthModal('login');
+    } else {
+      logoutUser();
+    }
+  }
+
+  // Auth Modal Controls
+  function openAuthModal(tab = 'login') {
+    document.getElementById('auth-modal').style.display = 'flex';
+    switchAuthTab(tab);
+  }
+  
+  function closeAuthModal() {
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('login-alert').style.display = 'none';
+    document.getElementById('signup-alert').style.display = 'none';
+  }
+  
+  function switchAuthTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    document.getElementById('panel-login').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('panel-signup').style.display = isLogin ? 'none' : 'block';
+  }
 
   // Modal Control Functions
   function openSettingsModal() {
@@ -503,7 +640,9 @@ async function health(){
 
   function logoutUser() {
     localStorage.removeItem('sevenforce_token');
-    window.location.href = 'index.html';
+    localStorage.removeItem('sevenforce_offline_mode');
+    localStorage.removeItem('sevenforce_offline_username');
+    window.location.reload();
   }
 </script>
 

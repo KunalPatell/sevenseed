@@ -315,12 +315,7 @@
 <script>
   function handleLaunchApp(e) {
     e.preventDefault();
-    const token = localStorage.getItem('sevenforce_token');
-    if (token) {
-      window.location.href = 'app.html';
-    } else {
-      openAuthModal('login');
-    }
+    window.location.href = 'app.html';
   }
   
   function openAuthModal(tab = 'login') {
