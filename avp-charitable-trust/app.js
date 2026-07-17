@@ -258,12 +258,66 @@ if (!noHover) document.querySelectorAll('.btn-primary').forEach(function(el){
     if (payload.drug1 || payload.drug2) {
       payload = { drugs: [payload.drug1 || '', payload.drug2 || ''].filter(Boolean) };
     }
+
+    // Shared domain localStorage verification
+    var token = localStorage.getItem('sevenforce_token');
+    var isDemo = !token || token === 'demo_token';
+    var hasKeys = localStorage.getItem('user_groq_key') || 
+                  localStorage.getItem('user_gemini_key') || 
+                  localStorage.getItem('user_openai_key') || 
+                  localStorage.getItem('user_serpapi_key') || 
+                  localStorage.getItem('user_huggingface_key') || 
+                  localStorage.getItem('user_mistral_key');
+
+    if (isDemo || !hasKeys) {
+      // Offline/Demo Preview Fallback
+      setTimeout(function(){
+        var data;
+        if (endpoint.indexOf('/evaluate') !== -1) {
+          data = { score: 90, evaluation: "Venture proposal successfully analyzed. Strong AI leverage. Recommendations: Implement unified local storage BYOK, scale RAG indexes." };
+        } else if (endpoint.indexOf('/interview-generate') !== -1) {
+          data = { questions: ["Tell me about a time you handled a resource starvation bug in Windows.", "How do you set reload=False dynamically in Uvicorn?", "Explain the difference between LangGraph and simple chain executors."] };
+        } else if (endpoint.indexOf('/study-plan') !== -1) {
+          data = { study_plan: ["Day 1: Basics of data structures (1hr study, 1hr practice)", "Day 2: Pandas dataframes and cleaning", "Day 3: Aggregations and groupby", "Day 4: Data visualization with Matplotlib", "Day 5: Real-world dataset analysis case study", "Day 6: Final project review", "Day 7: Performance profiling and optimization"] };
+        } else if (endpoint.indexOf('/interactions') !== -1) {
+          data = { interaction_found: true, severity: "High Danger", contraindication: "Aspirin combined with Warfarin significantly increases the risk of internal bleeding. Avoid co-administration without doctor review.", recommendation: "Consult a cardiologist immediately for safer alternatives." };
+        } else if (endpoint.indexOf('/boq') !== -1) {
+          data = { materials_required: { cement: "675 bags", sand: "1,800 cu ft", bricks: "33,750 pcs", steel: "4.5 tons" }, estimated_cost_inr: "₹ 27,00,000", duration_weeks: 24, quality_grade: payload.quality || "Premium" };
+        } else if (endpoint.indexOf('/needs') !== -1) {
+          data = { recommended_trust_aid: ["Deploying clean water filter plant (fluoride treatment)", "Initiating mobile primary school transport van", "Financing a local community health center weekly camp"] };
+        } else if (endpoint.indexOf('/compare') !== -1) {
+          data = { query: payload.query || "iPhone 15 Pro Max", results: [{ site: "Amazon India", price: "₹1,34,900", availability: "In Stock" }, { site: "Flipkart", price: "₹1,35,500", availability: "Out of Stock" }, { site: "Vijay Sales", price: "₹1,34,000", availability: "In Stock", best_value: true }, { site: "Croma", price: "₹1,36,000", availability: "In Stock" }] };
+        } else {
+          data = { success: true, mode: "Static Preview Mock Output" };
+        }
+        
+        output.textContent = '💡 DEMO MODE (Preview Output):\\n' + JSON.stringify(data, null, 2) + '\\n\\n💡 To run this live, sign in and add your API Keys at Sevenforce: https://kunalpatell.github.io/sevenseed/sevenforce/index.html';
+        btn.disabled = false;
+        btn.innerHTML = btnText;
+      }, 700);
+      return;
+    }
+
+    // Live Execution headers
+    var headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = "Bearer " + token;
     
+    var groq = localStorage.getItem("user_groq_key");
+    if (groq) headers["X-Groq-API-Key"] = groq;
+    var gemini = localStorage.getItem("user_gemini_key");
+    if (gemini) headers["X-Gemini-API-Key"] = gemini;
+    var openai = localStorage.getItem("user_openai_key");
+    if (openai) headers["X-OpenAI-API-Key"] = openai;
+    var serpapi = localStorage.getItem("user_serpapi_key");
+    if (serpapi) headers["X-SerpAPI-Key"] = serpapi;
+    var huggingface = localStorage.getItem("user_huggingface_key");
+    if (huggingface) headers["X-HuggingFace-API-Key"] = huggingface;
+    var mistral = localStorage.getItem("user_mistral_key");
+    if (mistral) headers["X-Mistral-API-Key"] = mistral;
+
     fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: headers,
       body: JSON.stringify(payload)
     })
     .then(function(res){
