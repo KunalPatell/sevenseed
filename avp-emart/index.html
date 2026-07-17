@@ -42,13 +42,14 @@
     <a href="#about">About</a>
     <a href="#services">AI Tools</a>
     
+    <a href="#sandbox">Live Demo</a>
     <a href="#process">Process</a>
     <a href="#testimonials">Reviews</a>
     <a href="#faq">FAQ</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
-    
+    <a class="btn btn-ghost" href="http://localhost:8007/dashboard"><i class="fas fa-wand-magic-sparkles"></i> Launch App</a>
     <a class="btn btn-primary" href="https://price-com-7.streamlit.app/" target="_blank" rel="noopener"><i class="fas fa-rocket"></i> Launch</a>
     <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fas fa-bars"></i></button>
   </div>
@@ -124,6 +125,48 @@
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic s"><i class="fas fa-wand-magic-sparkles"></i></div><h4>Smart Recommendations</h4><p>Personalised product recommendations tuned to your preferences.</p><span class="svc-tag"><i class="fas fa-bolt"></i>Recommender</span></article>
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic p"><i class="fas fa-chart-line"></i></div><h4>Price-Trend Forecasting</h4><p>AI predicts price movements so you buy at exactly the right time.</p><span class="svc-tag"><i class="fas fa-bolt"></i>ML Forecasting</span></article>
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic s"><i class="fas fa-comments"></i></div><h4>Review Intelligence</h4><p>NLP summarises thousands of reviews into a fast, trustworthy verdict.</p><span class="svc-tag"><i class="fas fa-bolt"></i>NLP Summarisation</span></article>
+  </div>
+</section>
+
+
+<section class="section sandbox-sec" id="sandbox">
+  <div class="eyebrow center">AI PLAYGROUND</div>
+  <h2 class="sec-title">Try the AI Live</h2>
+  <p class="sandbox-subtitle center">Simulate live shopping queries across online platforms. Enter a product name to search Flipkart, Amazon, Reliance, and Snapdeal.</p>
+  
+  <div class="sandbox-container reveal">
+    <div class="sandbox-card glow">
+      <div class="sandbox-card-header">
+        <div class="sandbox-dot red"></div>
+        <div class="sandbox-dot yellow"></div>
+        <div class="sandbox-dot green"></div>
+        <span class="sandbox-card-title">AI Price Comparator & Value Scorer</span>
+      </div>
+      <div class="sandbox-card-body">
+        <form class="sandbox-form" id="sandboxForm" data-endpoint="http://localhost:8007/api/compare">
+          
+        <div class="sandbox-field">
+          <label for="sb-query">Product Name</label>
+          <input type="text" id="sb-query" placeholder="e.g. iPhone 15 Pro Max" required>
+        </div>
+        
+          <button type="submit" class="btn btn-primary lg" id="sandboxBtn">
+            <i class="fas fa-play"></i> Run AI Model
+          </button>
+        </form>
+        <div class="sandbox-result">
+          <div class="sandbox-result-header">
+            <span>Terminal Output</span>
+            <button class="sandbox-copy-btn" id="sandboxCopy" type="button" aria-label="Copy output">
+              <i class="far fa-copy"></i>
+            </button>
+          </div>
+          <div class="sandbox-pre-wrap">
+            <pre class="sandbox-pre" id="sandboxOutput">// Output will be displayed here after you execute the model...</pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -226,7 +269,7 @@
     <div class="foot-col">
       <h5>The AI Group</h5>
       <ul>
-          <li><a href="https://comonk-ai.onrender.com" target="_blank" rel="noopener">Comonk Technology</a></li>
+          <li><a href="../comonk/index.html">Comonk Technology</a></li>
           <li><a href="../index.html">Sevenseed</a></li>
           <li><a href="../sevenforce/index.html">Sevenforce</a></li>
           <li><a href="../avpu/index.html">Alpaben Vipulbhai Patel University</a></li>

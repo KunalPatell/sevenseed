@@ -1,4 +1,4 @@
-// Enterprise site interactions — Sevenseed AI portfolio
+// Enterprise site interactions - Sevenseed AI portfolio
 document.body.classList.add('js');
 
 // Entrance orchestration: reveal blur-in elements + fire scramble
@@ -219,4 +219,77 @@ if (!noHover) document.querySelectorAll('.btn-primary').forEach(function(el){
   window.addEventListener('resize', resize);
   resize();
   if (!reduce) draw();
+})();
+
+// Sandbox Form Handler
+(function(){
+  var form = document.getElementById('sandboxForm');
+  if (!form) return;
+  var btn = document.getElementById('sandboxBtn');
+  var output = document.getElementById('sandboxOutput');
+  var endpoint = form.getAttribute('data-endpoint');
+  
+  if (window.location.protocol !== 'file:' && endpoint.includes('/api/')) {
+    var rawPath = endpoint.substring(endpoint.indexOf('/api/'));
+    // Use relative path to avoid CORS issues when serving from the same host
+    endpoint = rawPath;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (btn.disabled) return;
+    btn.disabled = true;
+    var btnText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    output.textContent = 'CONNECTING TO AI MODEL SERVER...\\nEXECUTING PIPELINE...\\nPLEASE WAIT...';
+    
+    var payload = {};
+    var fields = form.querySelectorAll('input, textarea, select');
+    fields.forEach(function(f){
+      if (!f.id) return;
+      var key = f.id.replace('sb-', '');
+      var val = f.value;
+      if (f.type === 'number') {
+        val = parseFloat(val);
+      }
+      payload[key] = val;
+    });
+
+    if (payload.drug1 || payload.drug2) {
+      payload = { drugs: [payload.drug1 || '', payload.drug2 || ''].filter(Boolean) };
+    }
+    
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res){
+      if (!res.ok) {
+        return res.text().then(function(t){ throw new Error(t || res.statusText) });
+      }
+      return res.json();
+    })
+    .then(function(data){
+      output.textContent = JSON.stringify(data, null, 2);
+    })
+    .catch(function(err){
+      output.textContent = '❌ ERROR EXECUTING MODEL:\\n' + err.message + '\\n\\n💡 Ensure the backend server for this venture is running on its designated port.';
+    })
+    .finally(function(){
+      btn.disabled = false;
+      btn.innerHTML = btnText;
+    });
+  });
+
+  var copyBtn = document.getElementById('sandboxCopy');
+  if (copyBtn) copyBtn.addEventListener('click', function(){
+    navigator.clipboard.writeText(output.textContent).then(function(){
+      var origHtml = copyBtn.innerHTML;
+      copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+      setTimeout(function(){ copyBtn.innerHTML = origHtml; }, 2000);
+    });
+  });
 })();

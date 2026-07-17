@@ -42,13 +42,14 @@
     <a href="#about">About</a>
     <a href="#services">AI Tools</a>
     <a href="#ventures">Ventures</a>
+    <a href="#sandbox">Live Demo</a>
     <a href="#process">Process</a>
     <a href="#testimonials">Reviews</a>
     <a href="#faq">FAQ</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
-    
+    <a class="btn btn-ghost" href="http://localhost:8001/dashboard"><i class="fas fa-wand-magic-sparkles"></i> Launch App</a>
     <a class="btn btn-primary" href="#contact"><i class="fas fa-envelope"></i> Contact</a>
     <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fas fa-bars"></i></button>
   </div>
@@ -131,13 +132,63 @@
   <div class="eyebrow center">THE PORTFOLIO</div>
   <h2 class="sec-title">Our AI ventures</h2>
   <div class="vent-grid">
-        <a class="vent-card glow reveal" href="https://comonk-ai.onrender.com" target="_blank" rel="noopener" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-brain"></i></span><span class="vent-live"><i class="fas fa-circle"></i> Live</span></div><h4>Comonk Technology</h4><span class="vent-sector">AI Career Intelligence</span><p>Enterprise AI career platform — LangGraph agents, RAG job matching, and mock interviews.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
+        <a class="vent-card glow reveal" href="comonk/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-brain"></i></span></div><h4>Comonk Technology</h4><span class="vent-sector">AI Career Intelligence</span><p>Enterprise AI career platform — LangGraph agents, RAG job matching, and mock interviews.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
         <a class="vent-card glow reveal" href="sevenforce/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-users-gear"></i></span></div><h4>Sevenforce</h4><span class="vent-sector">AI Workforce</span><p>Hire a team of AI employees for marketing, sales, hiring, meetings, and data — one platform.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
         <a class="vent-card glow reveal" href="avpu/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-graduation-cap"></i></span></div><h4>Alpaben Vipulbhai Patel University</h4><span class="vent-sector">AI Education</span><p>An AI-powered university with a personal AI tutor and adaptive, career-ready learning.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
         <a class="vent-card glow reveal" href="decode-forest-pharmacy/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-mortar-pestle"></i></span></div><h4>Decode Forest Pharmacy</h4><span class="vent-sector">AI Pharmacy</span><p>AI reads prescriptions, checks drug interactions, and delivers genuine medicines fast.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
         <a class="vent-card glow reveal" href="breakdown-factor/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-helmet-safety"></i></span></div><h4>Breakdown Factor Construction</h4><span class="vent-sector">AI Construction</span><p>Computer-vision site safety and AI cost forecasting for builds that last.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
         <a class="vent-card glow reveal" href="avp-charitable-trust/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-hand-holding-heart"></i></span></div><h4>AVP Charitable Trust</h4><span class="vent-sector">AI for Social Impact</span><p>AI finds where help matters most and reports transparent, measurable impact.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
         <a class="vent-card glow reveal" href="avp-emart/index.html" data-tilt><div class="vent-top"><span class="vent-ic"><i class="fas fa-cart-shopping"></i></span></div><h4>AVP Emart</h4><span class="vent-sector">AI E-Commerce</span><p>AI compares live prices across four platforms and finds you the best value.</p><span class="vent-go">Visit site <i class="fas fa-arrow-right"></i></span></a>
+  </div>
+</section>
+
+
+<section class="section sandbox-sec" id="sandbox">
+  <div class="eyebrow center">AI PLAYGROUND</div>
+  <h2 class="sec-title">Try the AI Live</h2>
+  <p class="sandbox-subtitle center">Validate your AI startup concept instantly. Our LLM-driven evaluation system checks viability, market potential, and alignment with the studio's portfolio.</p>
+  
+  <div class="sandbox-container reveal">
+    <div class="sandbox-card glow">
+      <div class="sandbox-card-header">
+        <div class="sandbox-dot red"></div>
+        <div class="sandbox-dot yellow"></div>
+        <div class="sandbox-dot green"></div>
+        <span class="sandbox-card-title">AI Venture Idea Evaluator</span>
+      </div>
+      <div class="sandbox-card-body">
+        <form class="sandbox-form" id="sandboxForm" data-endpoint="http://localhost:8001/api/tools/evaluate">
+          
+        <div class="sandbox-field">
+          <label for="sb-name">Venture Name</label>
+          <input type="text" id="sb-name" placeholder="e.g. EcoSphere" required>
+        </div>
+        <div class="sandbox-field">
+          <label for="sb-sector">Industry Sector</label>
+          <input type="text" id="sb-sector" placeholder="e.g. ClimateTech / Carbon Reporting" required>
+        </div>
+        <div class="sandbox-field">
+          <label for="sb-description">Description & AI Angle</label>
+          <textarea id="sb-description" rows="4" placeholder="Describe the problem, target audience, and how AI solves it..." required></textarea>
+        </div>
+        
+          <button type="submit" class="btn btn-primary lg" id="sandboxBtn">
+            <i class="fas fa-play"></i> Run AI Model
+          </button>
+        </form>
+        <div class="sandbox-result">
+          <div class="sandbox-result-header">
+            <span>Terminal Output</span>
+            <button class="sandbox-copy-btn" id="sandboxCopy" type="button" aria-label="Copy output">
+              <i class="far fa-copy"></i>
+            </button>
+          </div>
+          <div class="sandbox-pre-wrap">
+            <pre class="sandbox-pre" id="sandboxOutput">// Output will be displayed here after you execute the model...</pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -240,7 +291,7 @@
     <div class="foot-col">
       <h5>The AI Group</h5>
       <ul>
-          <li><a href="https://comonk-ai.onrender.com" target="_blank" rel="noopener">Comonk Technology</a></li>
+          <li><a href="comonk/index.html">Comonk Technology</a></li>
           <li><span class="foot-current">Sevenseed</span></li>
           <li><a href="sevenforce/index.html">Sevenforce</a></li>
           <li><a href="avpu/index.html">Alpaben Vipulbhai Patel University</a></li>

@@ -42,13 +42,14 @@
     <a href="#about">About</a>
     <a href="#services">AI Tools</a>
     
+    <a href="#sandbox">Live Demo</a>
     <a href="#process">Process</a>
     <a href="#testimonials">Reviews</a>
     <a href="#faq">FAQ</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
-    
+    <a class="btn btn-ghost" href="http://localhost:8004/dashboard"><i class="fas fa-wand-magic-sparkles"></i> Launch App</a>
     <a class="btn btn-primary" href="#contact"><i class="fas fa-envelope"></i> Contact</a>
     <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fas fa-bars"></i></button>
   </div>
@@ -124,6 +125,52 @@
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic s"><i class="fas fa-robot"></i></div><h4>AI Health Assistant</h4><p>A 24/7 LLM assistant answers your medicine and wellness questions.</p><span class="svc-tag"><i class="fas fa-bolt"></i>Groq LLaMA 3.3</span></article>
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic p"><i class="fas fa-calendar-check"></i></div><h4>Refill Prediction</h4><p>AI predicts when you'll run out and reminds you to reorder in time.</p><span class="svc-tag"><i class="fas fa-bolt"></i>ML Forecasting</span></article>
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic s"><i class="fas fa-truck-fast"></i></div><h4>Smart Delivery Routing</h4><p>Route-optimisation AI ensures the fastest possible doorstep delivery.</p><span class="svc-tag"><i class="fas fa-bolt"></i>Optimisation</span></article>
+  </div>
+</section>
+
+
+<section class="section sandbox-sec" id="sandbox">
+  <div class="eyebrow center">AI PLAYGROUND</div>
+  <h2 class="sec-title">Try the AI Live</h2>
+  <p class="sandbox-subtitle center">Scan medicine lists for dangerous chemical interactions. Type in two drugs to run our LLM safety protocols.</p>
+  
+  <div class="sandbox-container reveal">
+    <div class="sandbox-card glow">
+      <div class="sandbox-card-header">
+        <div class="sandbox-dot red"></div>
+        <div class="sandbox-dot yellow"></div>
+        <div class="sandbox-dot green"></div>
+        <span class="sandbox-card-title">AI Drug Interaction Checker</span>
+      </div>
+      <div class="sandbox-card-body">
+        <form class="sandbox-form" id="sandboxForm" data-endpoint="http://localhost:8004/api/interactions">
+          
+        <div class="sandbox-field">
+          <label for="sb-drug1">Primary Medicine (Drug 1)</label>
+          <input type="text" id="sb-drug1" placeholder="e.g. Aspirin" required>
+        </div>
+        <div class="sandbox-field">
+          <label for="sb-drug2">Secondary Medicine (Drug 2)</label>
+          <input type="text" id="sb-drug2" placeholder="e.g. Warfarin" required>
+        </div>
+        
+          <button type="submit" class="btn btn-primary lg" id="sandboxBtn">
+            <i class="fas fa-play"></i> Run AI Model
+          </button>
+        </form>
+        <div class="sandbox-result">
+          <div class="sandbox-result-header">
+            <span>Terminal Output</span>
+            <button class="sandbox-copy-btn" id="sandboxCopy" type="button" aria-label="Copy output">
+              <i class="far fa-copy"></i>
+            </button>
+          </div>
+          <div class="sandbox-pre-wrap">
+            <pre class="sandbox-pre" id="sandboxOutput">// Output will be displayed here after you execute the model...</pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -226,7 +273,7 @@
     <div class="foot-col">
       <h5>The AI Group</h5>
       <ul>
-          <li><a href="https://comonk-ai.onrender.com" target="_blank" rel="noopener">Comonk Technology</a></li>
+          <li><a href="../comonk/index.html">Comonk Technology</a></li>
           <li><a href="../index.html">Sevenseed</a></li>
           <li><a href="../sevenforce/index.html">Sevenforce</a></li>
           <li><a href="../avpu/index.html">Alpaben Vipulbhai Patel University</a></li>

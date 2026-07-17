@@ -2,9 +2,9 @@
   --bg:#060609; --bg-1:#0d0d16; --bg-2:#12121e; --bg-3:#18182a;
   --border:rgba(255,255,255,.07); --border-hi:rgba(255,255,255,.14);
   --text:#eeeef8; --text-2:#9aa0b8; --text-3:#5b5f78;
-  --primary:#f43f5e; --primary-l:#fda4af;
-  --secondary:#f59e0b; --secondary-l:#fcd34d;
-  --primary-rgb:244,63,94; --secondary-rgb:245,158,11;
+  --primary:#0ea5e9; --primary-l:#7dd3fc;
+  --secondary:#8b5cf6; --secondary-l:#c4b5fd;
+  --primary-rgb:14,165,233; --secondary-rgb:139,92,246;
   --radius:16px; --radius-sm:10px;
   --shadow:0 10px 40px rgba(0,0,0,.45); --shadow-lg:0 24px 70px rgba(0,0,0,.6);
   --maxw:1180px; --nav-h:66px; --t:.25s ease;
