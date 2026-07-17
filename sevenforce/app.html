@@ -376,6 +376,10 @@ function render(d){
 }
 
 async function health(){
+  if (localStorage.getItem("sevenforce_offline_mode") === "1") {
+    $("#prov").innerHTML = `provider: <b>Static Preview (Demo)</b>`;
+    return;
+  }
   try{const r=await fetch("/api/health");const d=await r.json();$("#prov").innerHTML=`provider: <b>${esc(d.provider||'?')}</b>`;}
   catch(e){$("#prov").innerHTML=`<span class="err">backend offline</span>`;}
 }
