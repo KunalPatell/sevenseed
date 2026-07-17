@@ -1,4 +1,4 @@
-// Enterprise site interactions - Sevenseed AI portfolio
+// Enterprise site interactions — Sevenseed AI portfolio
 document.body.classList.add('js');
 
 // Entrance orchestration: reveal blur-in elements + fire scramble
@@ -221,75 +221,74 @@ if (!noHover) document.querySelectorAll('.btn-primary').forEach(function(el){
   if (!reduce) draw();
 })();
 
-// Sandbox Form Handler
-(function(){
-  var form = document.getElementById('sandboxForm');
-  if (!form) return;
-  var btn = document.getElementById('sandboxBtn');
-  var output = document.getElementById('sandboxOutput');
-  var endpoint = form.getAttribute('data-endpoint');
+/* ── Auth Form Event Handlers (Comonk Style) ── */
+async function submitLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const alertEl = document.getElementById('login-alert');
   
-  if (window.location.protocol !== 'file:' && endpoint.includes('/api/')) {
-    var rawPath = endpoint.substring(endpoint.indexOf('/api/'));
-    // Use relative path to avoid CORS issues when serving from the same host
-    endpoint = rawPath;
-  }
-
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    if (btn.disabled) return;
-    btn.disabled = true;
-    var btnText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-    output.textContent = 'CONNECTING TO AI MODEL SERVER...\\nEXECUTING PIPELINE...\\nPLEASE WAIT...';
-    
-    var payload = {};
-    var fields = form.querySelectorAll('input, textarea, select');
-    fields.forEach(function(f){
-      if (!f.id) return;
-      var key = f.id.replace('sb-', '');
-      var val = f.value;
-      if (f.type === 'number') {
-        val = parseFloat(val);
-      }
-      payload[key] = val;
-    });
-
-    if (payload.drug1 || payload.drug2) {
-      payload = { drugs: [payload.drug1 || '', payload.drug2 || ''].filter(Boolean) };
-    }
-    
-    fetch(endpoint, {
+  alertEl.style.display = 'none';
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const origText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+  
+  try {
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(function(res){
-      if (!res.ok) {
-        return res.text().then(function(t){ throw new Error(t || res.statusText) });
-      }
-      return res.json();
-    })
-    .then(function(data){
-      output.textContent = JSON.stringify(data, null, 2);
-    })
-    .catch(function(err){
-      output.textContent = '❌ ERROR EXECUTING MODEL:\\n' + err.message + '\\n\\n💡 Ensure the backend server for this venture is running on its designated port.';
-    })
-    .finally(function(){
-      btn.disabled = false;
-      btn.innerHTML = btnText;
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
     });
-  });
+    const data = await res.json();
+    if (res.ok && data.token) {
+      localStorage.setItem('sevenforce_token', data.token);
+      window.location.href = 'app.html';
+    } else {
+      alertEl.textContent = data.error || 'Invalid credentials. Please try again.';
+      alertEl.style.display = 'block';
+    }
+  } catch (err) {
+    alertEl.textContent = 'Network error. Make sure the backend server is running.';
+    alertEl.style.display = 'block';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = origText;
+  }
+}
 
-  var copyBtn = document.getElementById('sandboxCopy');
-  if (copyBtn) copyBtn.addEventListener('click', function(){
-    navigator.clipboard.writeText(output.textContent).then(function(){
-      var origHtml = copyBtn.innerHTML;
-      copyBtn.innerHTML = '<i class="fas fa-check"></i>';
-      setTimeout(function(){ copyBtn.innerHTML = origHtml; }, 2000);
+async function submitSignup(e) {
+  e.preventDefault();
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const alertEl = document.getElementById('signup-alert');
+  
+  alertEl.style.display = 'none';
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  const origText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+  
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
     });
-  });
-})();
+    const data = await res.json();
+    if (res.ok && data.token) {
+      localStorage.setItem('sevenforce_token', data.token);
+      window.location.href = 'app.html';
+    } else {
+      alertEl.textContent = data.error || 'Failed to create account.';
+      alertEl.style.display = 'block';
+    }
+  } catch (err) {
+    alertEl.textContent = 'Network error. Make sure the backend server is running.';
+    alertEl.style.display = 'block';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = origText;
+  }
+}

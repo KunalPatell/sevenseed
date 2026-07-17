@@ -42,14 +42,13 @@
     <a href="#about">About</a>
     <a href="#services">AI Tools</a>
     
-    <a href="#sandbox">Live Demo</a>
     <a href="#process">Process</a>
     <a href="#testimonials">Reviews</a>
     <a href="#faq">FAQ</a>
     <a href="#contact">Contact</a>
   </div>
   <div class="nav-right">
-    <a class="btn btn-ghost" href="http://localhost:8002/app"><i class="fas fa-wand-magic-sparkles"></i> Launch App</a>
+    <a class="btn btn-ghost" href="#" onclick="handleLaunchApp(event)"><i class="fas fa-wand-magic-sparkles"></i> Launch App</a>
     <a class="btn btn-primary" href="#contact"><i class="fas fa-envelope"></i> Contact</a>
     <button class="hamburger" id="hamburger" aria-label="Menu"><i class="fas fa-bars"></i></button>
   </div>
@@ -126,56 +125,6 @@
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic p"><i class="fas fa-microphone-lines"></i></div><h4>Echo — Meeting Assistant</h4><p>Turns any transcript into a clean summary, decisions, and owner-tagged action items.</p><span class="svc-tag"><i class="fas fa-bolt"></i>Agency AI</span></article>
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic s"><i class="fas fa-user-tie"></i></div><h4>Scout — AI Recruiter</h4><p>Screens resumes, generates interview questions, and scores answers on seven dimensions.</p><span class="svc-tag"><i class="fas fa-bolt"></i>Agency AI</span></article>
         <article class="svc-card glow reveal" data-tilt><div class="svc-ic p"><i class="fas fa-chart-column"></i></div><h4>Sage — Data Analyst</h4><p>Answers questions about your data in plain English with a safe, instant NL-to-SQL engine.</p><span class="svc-tag"><i class="fas fa-bolt"></i>Agency AI</span></article>
-  </div>
-</section>
-
-
-<section class="section sandbox-sec" id="sandbox">
-  <div class="eyebrow center">AI PLAYGROUND</div>
-  <h2 class="sec-title">Try the AI Live</h2>
-  <p class="sandbox-subtitle center">Simulate our Scout HR Agent. Input a target role and job description to automatically generate tailored interview questions and evaluation guidance.</p>
-  
-  <div class="sandbox-container reveal">
-    <div class="sandbox-card glow">
-      <div class="sandbox-card-header">
-        <div class="sandbox-dot red"></div>
-        <div class="sandbox-dot yellow"></div>
-        <div class="sandbox-dot green"></div>
-        <span class="sandbox-card-title">Scout — AI Recruiter Simulator</span>
-      </div>
-      <div class="sandbox-card-body">
-        <form class="sandbox-form" id="sandboxForm" data-endpoint="http://localhost:8002/api/tools/interview-generate">
-          
-        <div class="sandbox-field">
-          <label for="sb-role">Target Role</label>
-          <input type="text" id="sb-role" placeholder="e.g. Senior Python Engineer" required>
-        </div>
-        <div class="sandbox-field">
-          <label for="sb-jd">Job Description (Brief)</label>
-          <textarea id="sb-jd" rows="3" placeholder="Core duties, technology stack, and requirements..." required></textarea>
-        </div>
-        <div class="sandbox-field">
-          <label for="sb-resume">Candidate Profile (Optional)</label>
-          <textarea id="sb-resume" rows="2" placeholder="Paste resume bullet points or skills summary..."></textarea>
-        </div>
-        
-          <button type="submit" class="btn btn-primary lg" id="sandboxBtn">
-            <i class="fas fa-play"></i> Run AI Model
-          </button>
-        </form>
-        <div class="sandbox-result">
-          <div class="sandbox-result-header">
-            <span>Terminal Output</span>
-            <button class="sandbox-copy-btn" id="sandboxCopy" type="button" aria-label="Copy output">
-              <i class="far fa-copy"></i>
-            </button>
-          </div>
-          <div class="sandbox-pre-wrap">
-            <pre class="sandbox-pre" id="sandboxOutput">// Output will be displayed here after you execute the model...</pre>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -278,7 +227,7 @@
     <div class="foot-col">
       <h5>The AI Group</h5>
       <ul>
-          <li><a href="../comonk/index.html">Comonk Technology</a></li>
+          <li><a href="https://comonk-ai.onrender.com" target="_blank" rel="noopener">Comonk Technology</a></li>
           <li><a href="../index.html">Sevenseed</a></li>
           <li><span class="foot-current">Sevenforce</span></li>
           <li><a href="../avpu/index.html">Alpaben Vipulbhai Patel University</a></li>
@@ -302,6 +251,97 @@
     <span class="foot-venture"><i class="fas fa-seedling"></i> A Sevenseed AI venture</span>
   </div>
 </footer>
+
+<!-- ── Auth Modal Popup ── -->
+<div id="auth-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
+    
+    <div class="auth-tabs">
+      <button id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">Log In</button>
+      <button id="tab-signup" class="auth-tab" onclick="switchAuthTab('signup')">Register</button>
+    </div>
+    
+    <!-- Login Panel -->
+    <div id="panel-login">
+      <h3>Access AI Workforce</h3>
+      <p class="subtitle">Log in to manage your AI employees, SEO tools, and analytics dashboards.</p>
+      
+      <div id="login-alert" class="alert-box error" style="display: none;"></div>
+      
+      <form id="form-login" onsubmit="submitLogin(event)">
+        <div class="fg-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="name@company.com">
+        </div>
+        <div class="fg-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+      </form>
+    </div>
+    
+    <!-- Signup Panel -->
+    <div id="panel-signup" style="display: none;">
+      <h3>Create Workspace Account</h3>
+      <p class="subtitle">Join Sevenforce to spin up brand, recruitment, and document agents.</p>
+      
+      <div id="signup-alert" class="alert-box error" style="display: none;"></div>
+      
+      <form id="form-signup" onsubmit="submitSignup(event)">
+        <div class="fg-group">
+          <label for="signup-name">Full Name</label>
+          <input type="text" id="signup-name" required placeholder="E.g., Kunal Patel">
+        </div>
+        <div class="fg-group">
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" required placeholder="name@company.com">
+        </div>
+        <div class="fg-group">
+          <label for="signup-password">Password (6+ characters)</label>
+          <input type="password" id="signup-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+          <i class="fas fa-user-plus"></i> Create Free Account
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handleLaunchApp(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('sevenforce_token');
+    if (token) {
+      window.location.href = 'app.html';
+    } else {
+      openAuthModal('login');
+    }
+  }
+  
+  function openAuthModal(tab = 'login') {
+    document.getElementById('auth-modal').style.display = 'flex';
+    switchAuthTab(tab);
+  }
+  
+  function closeAuthModal() {
+    document.getElementById('auth-modal').style.display = 'none';
+    document.getElementById('login-alert').style.display = 'none';
+    document.getElementById('signup-alert').style.display = 'none';
+  }
+  
+  function switchAuthTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-signup').classList.toggle('active', !isLogin);
+    document.getElementById('panel-login').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('panel-signup').style.display = isLogin ? 'none' : 'block';
+  }
+</script>
 
 <script src="app.js"></script>
 </body>

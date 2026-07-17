@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+  if (!localStorage.getItem('sevenforce_token')) {
+    window.location.href = 'index.html';
+  }
+</script>
+<title>Sevenforce — AI Workforce Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  :root{--cy:#06b6d4;--vi:#8b5cf6;--bg:#0b1020;--panel:#141b2e;--panel2:#1b2540;--line:#26304d;--tx:#e5ecf7;--mut:#93a1bf;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(139,92,246,.15),transparent),
+    radial-gradient(1000px 500px at -10% 10%,rgba(6,182,212,.13),transparent),var(--bg);color:var(--tx);min-height:100vh}
+  a{color:var(--cy);text-decoration:none}
+  header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:rgba(11,16,32,.85);backdrop-filter:blur(8px);z-index:5}
+  .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--cy),var(--vi));
+    display:grid;place-items:center;font-size:22px}
+  header h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.2px}
+  header .sub{color:var(--mut);font-size:12.5px}
+  .prov{margin-left:auto;font-size:12px;color:var(--mut);border:1px solid var(--line);padding:6px 11px;border-radius:20px}
+  .prov b{color:var(--cy)}
+  .wrap{display:flex;gap:0;min-height:calc(100vh - 73px)}
+  nav{width:230px;border-right:1px solid var(--line);padding:14px 10px;flex-shrink:0}
+  nav .grp{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut);margin:16px 10px 6px}
+  nav button{display:flex;gap:9px;align-items:center;width:100%;text-align:left;background:none;border:0;color:var(--tx);
+    padding:9px 11px;border-radius:9px;cursor:pointer;font-size:14px;transition:.15s}
+  nav button:hover{background:var(--panel)}
+  nav button.on{background:linear-gradient(135deg,rgba(6,182,212,.22),rgba(139,92,246,.22));box-shadow:inset 0 0 0 1px var(--line)}
+  nav .em{font-size:17px}
+  main{flex:1;padding:22px 26px;max-width:900px}
+  .ahead{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .ahead h2{margin:0;font-size:22px}
+  .ahead .role{color:var(--vi);font-weight:700;font-size:13px}
+  .adesc{color:var(--mut);margin:0 0 18px;font-size:13.5px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .card h3{margin:0 0 4px;font-size:15px}
+  .card .ep{color:var(--mut);font-size:11.5px;font-family:ui-monospace,Consolas,monospace;margin-bottom:12px}
+  label{display:block;font-size:12.5px;color:var(--mut);margin:10px 0 4px}
+  input,textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    color:var(--tx);padding:9px 11px;font-size:13.5px;font-family:inherit}
+  textarea{min-height:74px;resize:vertical}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .row>div{flex:1;min-width:130px}
+  button.run{margin-top:13px;background:linear-gradient(135deg,var(--cy),var(--vi));color:#06121f;border:0;
+    padding:10px 18px;border-radius:9px;font-weight:800;cursor:pointer;font-size:13.5px}
+  button.run:disabled{opacity:.55;cursor:wait}
+  .out{margin-top:13px;border-top:1px dashed var(--line);padding-top:12px;display:none}
+  .out.show{display:block}
+  .out pre{background:#0a1122;border:1px solid var(--line);border-radius:8px;padding:12px;overflow:auto;
+    font-size:12px;max-height:420px;white-space:pre-wrap;word-break:break-word}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+    padding:3px 10px;font-size:11.5px;margin:3px 4px 0 0}
+  .kv{font-size:13px;line-height:1.7}
+  .kv b{color:var(--cy)}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;margin-top:6px}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+  th{background:var(--panel2)}
+  .err{color:#fca5a5}
+  .score{font-size:34px;font-weight:800;background:linear-gradient(135deg,var(--cy),var(--vi));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .note{color:var(--mut);font-size:12px;margin-top:8px}
+  @media(max-width:760px){.wrap{flex-direction:column}nav{width:auto;display:flex;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--line)}nav .grp{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🤖</div>
+  <div><h1>Sevenforce</h1><div class="sub">Your AI Workforce · 7 AI employees</div></div>
+  <div class="prov" id="prov">provider: <b>...</b></div>
+  
+  <!-- Settings & Profile Controls -->
+  <button class="btn btn-ghost" id="settings-btn" title="Configure API Keys" onclick="openSettingsModal()" style="margin-left: 20px; font-size: 13px; padding: 8px 12px">
+    <i class="fas fa-cog"></i> API Keys
+  </button>
+  
+  <div class="user-profile-badge" id="user-profile">
+    <span class="user-name" id="user-display-name">Loading...</span>
+    <button class="btn-logout" onclick="logoutUser()">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+  </div>
+</header>
+<div class="wrap">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<script>
+const AGENTS = [
+  {id:"owl", suite:"Orchestrator", em:"🦉", name:"Owl", role:"AI Chief of Staff",
+   desc:"Describe any task in plain English — Owl (a LangGraph multi-agent graph) routes it to the right AI employee, runs it, and reports back.", tools:[
+    {t:"Ask Owl to do anything", ep:"/api/agent/run", f:[{k:"message",l:"What do you need done? e.g. 'write 3 LinkedIn captions for our new AI CRM' or 'score this lead: CTO at a fintech'",type:"textarea"}]},
+  ]},
+  {id:"maya", suite:"Growth AI", em:"🖊️", name:"Maya", role:"Content & SEO",
+   desc:"Brand research, SEO topics and full long-form articles.", tools:[
+    {t:"Brand profile from a URL", ep:"/api/tools/brand-profile", f:[{k:"url",l:"Website URL"}]},
+    {t:"Site content scraper", ep:"/api/tools/site-scrape", f:[{k:"url",l:"Website URL"}]},
+    {t:"SEO topic ideas", ep:"/api/tools/content-topics", f:[{k:"name",l:"Brand name"},{k:"industry"},{k:"audience",l:"Target audience"},{k:"tone"},{k:"n",l:"How many",type:"number",def:5}]},
+    {t:"Long-form SEO article", ep:"/api/tools/content-blog", f:[{k:"name",l:"Brand"},{k:"industry"},{k:"audience"},{k:"tone"},{k:"title",l:"Blog title"},{k:"angle",l:"Angle / brief",type:"textarea"}]},
+  ]},
+  {id:"vibe", suite:"Growth AI", em:"📱", name:"Vibe", role:"Social Media",
+   desc:"Platform-perfect captions for every channel.", tools:[
+    {t:"Social captions", ep:"/api/tools/social-captions", f:[{k:"topic",l:"Post topic / product",type:"textarea"},{k:"brand"},{k:"platforms",l:"Platforms (comma sep)",type:"csv",def:"instagram, linkedin, x"}]},
+  ]},
+  {id:"wave", suite:"Growth AI", em:"💬", name:"Wave", role:"Sales & Comms + Lead Gen",
+   desc:"WhatsApp, email campaigns, and the full lead-gen suite.", tools:[
+    {t:"Ideal Customer Profile (ICP)", ep:"/api/tools/icp", f:[{k:"product",l:"Your product",type:"textarea"},{k:"market",l:"Target market"}]},
+    {t:"Lead scoring & qualification", ep:"/api/tools/lead-score", f:[{k:"lead",l:"Lead details (name/company/role/notes)",type:"textarea"},{k:"offer",l:"Your offer"}]},
+    {t:"Cold outreach sequence", ep:"/api/tools/outreach-sequence", f:[{k:"persona",l:"Target persona",type:"textarea"},{k:"offer"},{k:"channel",type:"select",opts:["email","linkedin","whatsapp"]},{k:"steps",type:"number",def:3}]},
+    {t:"Validate an email list", ep:"/api/tools/validate-emails", f:[{k:"emails",l:"Emails (one per line)",type:"lines"}]},
+    {t:"WhatsApp message", ep:"/api/notify/whatsapp", f:[{k:"to",l:"Phone (with country code)"},{k:"body",l:"Message",type:"textarea"}]},
+    {t:"Bulk email campaign", ep:"/api/campaigns/send", f:[{k:"subject"},{k:"body",l:"HTML/text body — use {name}",type:"textarea"},{k:"recipients",l:"Recipients (one per line: email,Name)",type:"recipients"}]},
+  ]},
+  {id:"nova", suite:"Agency AI", em:"📝", name:"Nova", role:"Business Analyst",
+   desc:"Discovery questions, full BRD/PRD docs (Word), test cases.", tools:[
+    {t:"Discovery questions", ep:"/api/tools/doc-questions", f:[{k:"doc_type",type:"select",opts:["BRD","SRS","FRS","PRD","CHARTER","BUSINESS_PLAN","SOW"]},{k:"requirements",l:"Project brief",type:"textarea"}]},
+    {t:"Generate document (Markdown)", ep:"/api/tools/doc-generate", f:[{k:"doc_type",type:"select",opts:["BRD","SRS","FRS","PRD","CHARTER","BUSINESS_PLAN","SOW"]},{k:"project_name"},{k:"requirements",l:"Project brief",type:"textarea"},{k:"extra",l:"Extra context",type:"textarea"}]},
+    {t:"Download document as Word (.docx)", ep:"/api/download/docx", download:true, f:[{k:"doc_type"},{k:"project_name"},{k:"markdown",l:"Markdown content",type:"textarea"}]},
+    {t:"Test cases + acceptance criteria", ep:"/api/tools/test-cases", f:[{k:"feature",l:"Feature to test",type:"textarea"},{k:"context"}]},
+    {t:"Analyse Figma design (UI, stories, QA)", ep:"/api/tools/figma-analyze", f:[{k:"url",l:"Figma Design URL"},{k:"token",l:"Figma Access Token (optional)"},{k:"gemini_key",l:"Gemini API Key (optional)"}]},
+  ]},
+  {id:"echo", suite:"Agency AI", em:"🎙️", name:"Echo", role:"Meeting Assistant",
+   desc:"Turns a transcript into summary, decisions and action items.", tools:[
+    {t:"Summarise a transcript", ep:"/api/tools/summarize-transcript", f:[{k:"transcript",l:"Paste transcript",type:"textarea"},{k:"context"}]},
+  ]},
+  {id:"scout", suite:"Agency AI", em:"🧑‍💼", name:"Scout", role:"AI Recruiter",
+   desc:"Question generation, 7-dimension scoring, resume analysis.", tools:[
+    {t:"Generate interview questions", ep:"/api/tools/interview-generate", f:[{k:"role"},{k:"level",type:"select",opts:["junior","mid","senior","lead"]},{k:"n",type:"number",def:10},{k:"jd",l:"Job description",type:"textarea"},{k:"resume",l:"Resume (optional)",type:"textarea"}]},
+    {t:"Evaluate interview answers", ep:"/api/tools/interview-evaluate", f:[{k:"role"},{k:"level",type:"select",opts:["junior","mid","senior","lead"]},{k:"jd",l:"Job description",type:"textarea"},{k:"transcript",l:"Candidate answers / transcript",type:"textarea"}]},
+    {t:"Analyse a resume vs JD", ep:"/api/tools/resume-analyze", f:[{k:"resume",l:"Resume text",type:"textarea"},{k:"jd",l:"Job description (optional)",type:"textarea"}]},
+  ]},
+  {id:"sage", suite:"Agency AI", em:"📊", name:"Sage", role:"Data Analyst",
+   desc:"Ask questions about your data in plain English (safe NL→SQL).", tools:[
+    {t:"Ask your data", ep:"/api/tools/ask-data", f:[{k:"question",l:"e.g. how many users signed up this week?",type:"textarea"}]},
+  ]},
+];
+
+const $=(s,r=document)=>r.querySelector(s);
+let current="maya";
+
+function buildNav(){
+  const nav=$("#nav"); let html=""; let suite="";
+  for(const a of AGENTS){
+    if(a.suite!==suite){suite=a.suite; html+=`<div class="grp">${suite}</div>`;}
+    html+=`<button data-id="${a.id}" class="${a.id===current?'on':''}"><span class="em">${a.em}</span><span>${a.name} · <span style="color:var(--mut);font-size:12px">${a.role}</span></span></button>`;
+  }
+  nav.innerHTML=html;
+  nav.querySelectorAll("button").forEach(b=>b.onclick=()=>{current=b.dataset.id;buildNav();renderAgent();});
+}
+
+function field(f){
+  const id=`fld_${f.k}`;
+  const lab=`<label for="${id}">${f.l||f.k[0].toUpperCase()+f.k.slice(1).replace(/_/g,' ')}</label>`;
+  if(f.type==="textarea"||f.type==="lines"||f.type==="recipients") return lab+`<textarea id="${id}" data-k="${f.k}" data-t="${f.type}"></textarea>`;
+  if(f.type==="select"){const o=(f.opts||[]).map(x=>`<option>${x}</option>`).join("");return lab+`<select id="${id}" data-k="${f.k}">${o}</select>`;}
+  if(f.type==="number") return lab+`<input id="${id}" data-k="${f.k}" data-t="number" type="number" value="${f.def??''}">`;
+  return lab+`<input id="${id}" data-k="${f.k}" data-t="${f.type||'text'}" value="${f.def??''}">`;
+}
+
+function renderAgent(){
+  const a=AGENTS.find(x=>x.id===current);
+  let html=`<div class="ahead"><span style="font-size:26px">${a.em}</span><h2>${a.name}</h2><span class="role">${a.role} · ${a.suite}</span></div><p class="adesc">${a.desc}</p>`;
+  a.tools.forEach((tool,i)=>{
+    const fields=tool.f.map(field).join("");
+    const grouped = tool.f.length>2 ? `<div class="row">${tool.f.filter(f=>f.type!=='textarea'&&f.type!=='lines'&&f.type!=='recipients').map(f=>`<div>${field(f)}</div>`).join("")}</div>`+tool.f.filter(f=>f.type==='textarea'||f.type==='lines'||f.type==='recipients').map(field).join("") : fields;
+    html+=`<div class="card" data-tool="${a.id}_${i}"><h3>${tool.t}</h3><div class="ep">POST ${tool.ep}</div>${grouped}
+      <button class="run">Run</button><div class="out"><div class="body"></div></div></div>`;
+  });
+  $("#main").innerHTML=html;
+  $("#main").querySelectorAll(".card").forEach((card,i)=>{
+    card.querySelector(".run").onclick=()=>runTool(a.tools[i],card);
+  });
+}
+
+function collect(card){
+  const body={};
+  card.querySelectorAll("[data-k]").forEach(el=>{
+    const k=el.dataset.k, t=el.dataset.t, v=el.value.trim();
+    if(t==="number"){ if(v!=="") body[k]=parseFloat(v); }
+    else if(t==="csv"){ body[k]=v?v.split(",").map(x=>x.trim()).filter(Boolean):[]; }
+    else if(t==="lines"){ body[k]=v?v.split(/\n+/).map(x=>x.trim()).filter(Boolean):[]; }
+    else if(t==="recipients"){ body[k]=v?v.split(/\n+/).map(x=>{const p=x.split(",");return{email:(p[0]||"").trim(),name:(p[1]||"").trim()};}).filter(r=>r.email):[]; }
+    else if(v!=="") body[k]=v;
+  });
+  return body;
+}
+
+async function runTool(tool,card){
+  const btn=card.querySelector(".run"), out=card.querySelector(".out"), bodyEl=card.querySelector(".body");
+  const payload=collect(card);
+  btn.disabled=true; btn.textContent="Running..."; out.classList.add("show"); bodyEl.innerHTML=`<span class="note">Calling ${tool.ep} ...</span>`;
+  
+  // Construct headers
+  const headers = { "Content-Type": "application/json" };
+  const token = localStorage.getItem("sevenforce_token");
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  
+  const groq = localStorage.getItem("user_groq_key");
+  if (groq) headers["X-Groq-API-Key"] = groq;
+  const gemini = localStorage.getItem("user_gemini_key");
+  if (gemini) headers["X-Gemini-API-Key"] = gemini;
+  const openai = localStorage.getItem("user_openai_key");
+  if (openai) headers["X-OpenAI-API-Key"] = openai;
+  const serpapi = localStorage.getItem("user_serpapi_key");
+  if (serpapi) headers["X-SerpAPI-Key"] = serpapi;
+  const huggingface = localStorage.getItem("user_huggingface_key");
+  if (huggingface) headers["X-HuggingFace-API-Key"] = huggingface;
+  const mistral = localStorage.getItem("user_mistral_key");
+  if (mistral) headers["X-Mistral-API-Key"] = mistral;
+
+  try{
+    const res=await fetch(tool.ep,{method:"POST",headers,body:JSON.stringify(payload)});
+    if(tool.download){
+      if(!res.ok){throw new Error("HTTP "+res.status);}
+      const blob=await res.blob();
+      const url=URL.createObjectURL(blob);
+      const fn=(payload.project_name||"document")+"_"+(payload.doc_type||"doc")+".docx";
+      bodyEl.innerHTML=`<a class="run" style="display:inline-block;text-decoration:none" href="${url}" download="${fn.replace(/[^A-Za-z0-9_.]/g,'_')}">⬇ Download ${fn}</a>`;
+    }else{
+      const data=await res.json();
+      bodyEl.innerHTML=render(data);
+    }
+  }catch(e){ bodyEl.innerHTML=`<div class="err">Error: ${e.message}. Is the backend running?</div>`; }
+  btn.disabled=false; btn.textContent="Run";
+}
+
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function render(d){
+  if(d==null) return "<pre>(no response)</pre>";
+  if(d.error) return `<div class="err">${esc(d.error)}</div>`+(d.attempted_sql?`<pre>${esc(d.attempted_sql)}</pre>`:"");
+  let h="";
+  // owl orchestrator
+  if(d.reply&&d.agent){ let o=`<div class="kv"><b>🦉 Owl → ${esc(d.agent)}</b> <span class="pill">${esc(d.tool||'')}</span> <span class="pill">${esc(d.engine||'')} engine</span></div><div class="kv" style="margin:6px 0 10px;font-size:14px">${esc(d.reply)}</div>`; if(d.result) o+=render(d.result); return o; }
+  // captions
+  if(d.captions&&typeof d.captions==="object"){ for(const[k,v]of Object.entries(d.captions)) h+=`<div class="kv"><b>${esc(k)}</b></div><pre>${esc(v)}</pre>`; return h; }
+  // interview questions
+  if(Array.isArray(d.questions)){ d.questions.forEach((q,i)=>{h+=`<div class="kv"><b>Q${i+1}</b> <span class="pill">${esc(q.type||'')}</span> <span class="pill">${esc(q.difficulty||'')}</span><br>${esc(q.question||'')}${q.tip?`<br><span class="note">💡 ${esc(q.tip)}</span>`:''}</div>`;}); return h; }
+  // interview eval / resume analyze with scores
+  if(d.scores){ h+=`<div class="score">${d.overall_score??'-'}<span style="font-size:16px;color:var(--mut)">/100</span></div>`;
+    h+=Object.entries(d.scores).map(([k,v])=>`<span class="pill">${esc(k)}: <b style="color:var(--cy)">${esc(v)}</b></span>`).join("");
+    if(d.overall_recommendation)h+=`<div class="kv" style="margin-top:8px"><b>Verdict:</b> ${esc(d.overall_recommendation)}</div>`;
+    if(d.strengths)h+=`<div class="kv"><b>Strengths:</b> ${d.strengths.map(esc).join("; ")}</div>`;
+    if(d.areas_for_improvement)h+=`<div class="kv"><b>Improve:</b> ${d.areas_for_improvement.map(esc).join("; ")}</div>`;
+    return h; }
+  if(d.jd_match){ h+=`<div class="kv"><b>Seniority:</b> ${esc(d.seniority_level||'')} · <b>Exp:</b> ${esc(d.experience_years||'')}</div>`;
+    if(d.skills)h+=`<div>${(d.skills||[]).slice(0,20).map(s=>`<span class="pill">${esc(s)}</span>`).join("")}</div>`;
+    if(d.jd_match)h+=`<div class="kv" style="margin-top:8px"><b>JD match:</b> ${esc(d.jd_match.score)}/100 · <b>Missing:</b> ${(d.jd_match.missing_skills||[]).map(esc).join(", ")||'—'}</div>`;
+    return h; }
+  // ask-data rows
+  if(Array.isArray(d.rows)){ if(d.summary)h+=`<div class="kv"><b>Answer:</b> ${esc(d.summary)}</div>`;
+    if(d.sql)h+=`<div class="note">SQL: ${esc(d.sql)}</div>`;
+    if(d.rows.length){const cols=Object.keys(d.rows[0]);h+=`<table><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join("")}</tr>`+d.rows.slice(0,25).map(r=>`<tr>${cols.map(c=>`<td>${esc(r[c])}</td>`).join("")}</tr>`).join("")+`</table>`;}
+    return h||"<pre>"+esc(JSON.stringify(d,null,2))+"</pre>"; }
+  // topics
+  if(Array.isArray(d.topics)){ d.topics.forEach(t=>h+=`<div class="kv"><b>${esc(t.title||'')}</b><br><span class="note">${esc(t.description||'')}</span></div>`); return h; }
+  // outreach sequence
+  if(Array.isArray(d.sequence)){ d.sequence.forEach(s=>h+=`<div class="kv"><b>Step ${esc(s.step)}</b> (wait ${esc(s.wait_days??0)}d)${s.subject?` · <i>${esc(s.subject)}</i>`:''}<br>${esc(s.message||'')}</div>`); return h; }
+  // lead score
+  if(d.tier){ h+=`<div class="score">${d.score??'-'}</div><span class="pill">${esc(d.tier)}</span>`;
+    if(d.next_action)h+=`<div class="kv" style="margin-top:6px"><b>Next:</b> ${esc(d.next_action)} <span class="pill">${esc(d.suggested_channel||'')}</span></div>`; return h; }
+  // markdown / article / summary
+  if(d.markdown) return `<pre>${esc(d.markdown)}</pre>`;
+  if(d.html) return `<pre>${esc(d.html)}</pre>`+(d.meta_description?`<div class="note">meta: ${esc(d.meta_description)}</div>`:"");
+  if(d.summary){ h+=`<div class="kv">${esc(d.summary)}</div>`;
+    ["key_points","decisions","risks"].forEach(k=>{if(d[k]&&d[k].length)h+=`<div class="kv"><b>${k.replace('_',' ')}:</b><ul>${d[k].map(x=>`<li>${esc(typeof x==='object'?JSON.stringify(x):x)}</li>`).join("")}</ul></div>`;});
+    if(d.action_items&&d.action_items.length)h+=`<div class="kv"><b>Action items:</b><ul>${d.action_items.map(a=>`<li>${esc(a.task||a)} ${a.owner?`— ${esc(a.owner)}`:''} ${a.due?`(${esc(a.due)})`:''}</li>`).join("")}</ul></div>`;
+    return h; }
+  // whatsapp / campaign
+  if("sent" in d){ return `<div class="kv"><b>${d.sent?'✅ Sent':'⚠️ Not sent'}</b> ${d.error?esc(d.error):''}</div>`+(d.preview?`<pre>${esc(d.preview)}</pre>`:""); }
+  if("total" in d && d.results){ h+=`<div class="kv"><b>${d.sent??d.counts?.valid??0}</b> ok / <b>${d.total}</b> total</div>`;
+    h+=`<pre>${esc(JSON.stringify(d.results.slice(0,20),null,1))}</pre>`; return h; }
+  if(Array.isArray(d.questions_)) {}
+  return `<pre>${esc(JSON.stringify(d,null,2))}</pre>`;
+}
+
+async function health(){
+  try{const r=await fetch("/api/health");const d=await r.json();$("#prov").innerHTML=`provider: <b>${esc(d.provider||'?')}</b>`;}
+  catch(e){$("#prov").innerHTML=`<span class="err">backend offline</span>`;}
+}
+<!-- ── BYOK Settings Modal ── -->
+<div id="settings-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card" style="max-width: 520px;">
+    <button class="modal-close" onclick="closeSettingsModal()"><i class="fas fa-times"></i></button>
+    
+    <h3>API Key Settings</h3>
+    <p class="subtitle">Enter your own custom API keys to run agent model invocations directly on your account. Leaving a key empty falls back to the default server keys.</p>
+    
+    <div class="settings-grid">
+      <div class="fg-group">
+        <label for="byok-groq">Groq API Key</label>
+        <input type="password" id="byok-groq" placeholder="gsk_...">
+      </div>
+      <div class="fg-group">
+        <label for="byok-gemini">Gemini API Key</label>
+        <input type="password" id="byok-gemini" placeholder="AIzaSy...">
+      </div>
+      <div class="fg-group">
+        <label for="byok-openai">OpenAI API Key</label>
+        <input type="password" id="byok-openai" placeholder="sk-proj-...">
+      </div>
+      <div class="fg-group">
+        <label for="byok-serpapi">SerpAPI Key</label>
+        <input type="password" id="byok-serpapi" placeholder="serp_...">
+      </div>
+      <div class="fg-group">
+        <label for="byok-huggingface">HuggingFace Token</label>
+        <input type="password" id="byok-huggingface" placeholder="hf_...">
+      </div>
+      <div class="fg-group">
+        <label for="byok-mistral">Mistral API Key</label>
+        <input type="password" id="byok-mistral" placeholder="mistral_...">
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 10px;">
+      <button class="btn btn-ghost" onclick="closeSettingsModal()" style="padding: 9px 18px">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettingsKeys()" style="padding: 9px 18px">Save & Apply</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add direct profile loader on page load
+  (async function() {
+    const token = localStorage.getItem('sevenforce_token');
+    if (token) {
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.user) {
+            document.getElementById('user-display-name').textContent = data.user.name;
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+    // Fallback if token check failed
+    localStorage.removeItem('sevenforce_token');
+    window.location.href = 'index.html';
+  })();
+
+  // Modal Control Functions
+  function openSettingsModal() {
+    document.getElementById('byok-groq').value = localStorage.getItem('user_groq_key') || '';
+    document.getElementById('byok-gemini').value = localStorage.getItem('user_gemini_key') || '';
+    document.getElementById('byok-openai').value = localStorage.getItem('user_openai_key') || '';
+    document.getElementById('byok-serpapi').value = localStorage.getItem('user_serpapi_key') || '';
+    document.getElementById('byok-huggingface').value = localStorage.getItem('user_huggingface_key') || '';
+    document.getElementById('byok-mistral').value = localStorage.getItem('user_mistral_key') || '';
+    
+    document.getElementById('settings-modal').style.display = 'flex';
+  }
+
+  function closeSettingsModal() {
+    document.getElementById('settings-modal').style.display = 'none';
+  }
+
+  function saveSettingsKeys() {
+    const keys = {
+      'user_groq_key': document.getElementById('byok-groq').value.trim(),
+      'user_gemini_key': document.getElementById('byok-gemini').value.trim(),
+      'user_openai_key': document.getElementById('byok-openai').value.trim(),
+      'user_serpapi_key': document.getElementById('byok-serpapi').value.trim(),
+      'user_huggingface_key': document.getElementById('byok-huggingface').value.trim(),
+      'user_mistral_key': document.getElementById('byok-mistral').value.trim()
+    };
+
+    for (const [key, val] of Object.entries(keys)) {
+      if (val) {
+        localStorage.setItem(key, val);
+      } else {
+        localStorage.removeItem(key);
+      }
+    }
+
+    closeSettingsModal();
+    alert('API key settings saved! Reloading to apply.');
+    window.location.reload();
+  }
+
+  function logoutUser() {
+    localStorage.removeItem('sevenforce_token');
+    window.location.href = 'index.html';
+  }
+</script>
+
+<script src="app.js"></script>
+</body>
+</html>
