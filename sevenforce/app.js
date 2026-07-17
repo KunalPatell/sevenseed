@@ -243,14 +243,18 @@ async function submitLogin(e) {
     const data = await res.json();
     if (res.ok && data.token) {
       localStorage.setItem('sevenforce_token', data.token);
+      localStorage.removeItem('sevenforce_offline_mode');
       window.location.href = 'app.html';
     } else {
       alertEl.textContent = data.error || 'Invalid credentials. Please try again.';
       alertEl.style.display = 'block';
     }
   } catch (err) {
-    alertEl.textContent = 'Network error. Make sure the backend server is running.';
-    alertEl.style.display = 'block';
+    // Backend offline: Enter static preview fallback mode
+    localStorage.setItem('sevenforce_token', 'mock_static_preview_token');
+    localStorage.setItem('sevenforce_offline_mode', '1');
+    localStorage.setItem('sevenforce_offline_username', email.split('@')[0]);
+    window.location.href = 'app.html';
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = origText;
@@ -279,14 +283,18 @@ async function submitSignup(e) {
     const data = await res.json();
     if (res.ok && data.token) {
       localStorage.setItem('sevenforce_token', data.token);
+      localStorage.removeItem('sevenforce_offline_mode');
       window.location.href = 'app.html';
     } else {
       alertEl.textContent = data.error || 'Failed to create account.';
       alertEl.style.display = 'block';
     }
   } catch (err) {
-    alertEl.textContent = 'Network error. Make sure the backend server is running.';
-    alertEl.style.display = 'block';
+    // Backend offline: Enter static preview fallback mode
+    localStorage.setItem('sevenforce_token', 'mock_static_preview_token');
+    localStorage.setItem('sevenforce_offline_mode', '1');
+    localStorage.setItem('sevenforce_offline_username', name);
+    window.location.href = 'app.html';
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = origText;

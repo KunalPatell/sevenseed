@@ -196,6 +196,106 @@ async function runTool(tool,card){
   const payload=collect(card);
   btn.disabled=true; btn.textContent="Running..."; out.classList.add("show"); bodyEl.innerHTML=`<span class="note">Calling ${tool.ep} ...</span>`;
   
+  const isOffline = localStorage.getItem("sevenforce_offline_mode") === "1";
+  if (isOffline) {
+    // Simulate network latency
+    await new Promise(r => setTimeout(r, 800));
+    let data;
+    switch (tool.ep) {
+      case "/api/agent/run":
+        data = { reply: "🦉 **Owl AI Chief of Staff**:\n\nProcessed social media pipeline, qualified 14 outbound sales leads, and structured the construction project brief for Breakdown Factor.\n\n*Running in Static Preview Mode (Mock response)*", agent: "Owl", tool: "Workflow Orchestrator", engine: "Groq LLaMA 3.3" };
+        break;
+      case "/api/tools/brand-profile":
+        data = { brand: payload.url || "Sevenseed Brand", industry: "SaaS & AI Venture Studio", audience: "B2B Tech Startups", tone: "Professional, Bold, Futuristic" };
+        break;
+      case "/api/tools/site-scrape":
+        data = { html: "Mocked scraped site text body content showing premium SEO analysis tags.", meta_description: "Static preview scraper output" };
+        break;
+      case "/api/tools/content-topics":
+        data = { topics: [
+          { title: "Building in Public: The AI Studio Advantage", description: "How sharing reusable LangGraph agents cuts development times by 70%." },
+          { title: "Beyond Chatbots: Multi-Agent Systems in 2026", description: "Why autonomous workflows are replacing single-prompt interfaces for enterprises." },
+          { title: "Vector Search Moats", description: "Why your proprietary domain knowledge is the ultimate moat in LLM RAG applications." }
+        ]};
+        break;
+      case "/api/tools/content-blog":
+        data = { markdown: `# Building in Public: The AI Studio Advantage\n\nIn the era of commoditized AI models, speed is the ultimate metric. When every venture can tap into a shared, production-grade vector RAG and LangGraph orchestration backbone, the standard 6-month product cycle shrinks to a 2-week MVP sprint...\n\n*Generated in Static Preview Mode.*` };
+        break;
+      case "/api/tools/social-captions":
+        data = { captions: {
+          x: "💼 Meet your first digital workforce team that never sleeps. Sevenforce spins up content, sales, recruiting, and dev agents on a single unified platform. 🤖 #GenerativeAI #FutureOfWork",
+          linkedin: "We are thrilled to launch Sevenforce today! 🚀\n\nOur platform gives businesses access to a team of specialized AI employees for SEO, social media, lead scoring, document extraction, and database analysis. All running on our shared LangGraph multi-agent stack. 🤖\n\nTry it now for free at kunalpatell.github.io/sevenseed/ 🌐",
+          instagram: "Stop adding headcount. Start scaling throughput. 🤖\nSevenforce AI employees run your socials, lead gen, QA testing, and databases 24/7. Link in bio! 📲"
+        }};
+        break;
+      case "/api/tools/icp":
+        data = { markdown: `## Ideal Customer Profile (ICP) for ${payload.product || "this product"}\n\n- **Target Company Size**: 10 - 150 employees (MSMEs, Startup Agencies)\n- **Primary Personas**: Operations Managers, Head of Marketing, Sales Directors\n- **Core Pain Points**: Operations bandwidth bottlenecks, high agency retainers, slow hiring pipelines\n- **Suggested Value Proposition**: Hire 7 specialized AI employees for the cost of a single software license.` };
+        break;
+      case "/api/tools/lead-score":
+        data = { score: 88, tier: "A-Tier hot lead", next_action: "Send calendar scheduling link for a 15-min discovery call", suggested_channel: "Email" };
+        break;
+      case "/api/tools/outreach-sequence":
+        data = { sequence: [
+          { step: 1, wait_days: 0, subject: `Boost productivity at ${payload.persona || "your firm"}`, message: "Hi,\n\nSaw you're scaling operations. We built a digital team of AI employees that run socials, lead scoring, and BRD docs 24/7. Thought it could free up operations bandwidth for your team...\n\nBest,\nSevenforce AI" },
+          { step: 2, wait_days: 3, subject: "Quick follow up", message: "Hi,\n\nJust wanted to see if you had 5 mins to look over our sample AI Business Analyst output? Let me know if you want a custom preview...\n\nBest,\nSevenforce AI" }
+        ]};
+        break;
+      case "/api/tools/validate-emails":
+        data = { total: (payload.emails || []).length || 2, results: [
+          { email: (payload.emails && payload.emails[0]) || "test@domain.com", valid: true, deliverable: true, score: 95 },
+          { email: (payload.emails && payload.emails[1]) || "fake@nonexistent.org", valid: false, deliverable: false, score: 0 }
+        ]};
+        break;
+      case "/api/notify/whatsapp":
+        data = { sent: true, preview: `Sent message template to ${payload.to || "+91..."}: "${payload.body || "Hello"}"` };
+        break;
+      case "/api/campaigns/send":
+        data = { sent: true, counts: { valid: (payload.recipients || []).length || 5, sent: (payload.recipients || []).length || 5 } };
+        break;
+      case "/api/tools/doc-questions":
+        data = { questions_ : [
+          "1. What are the primary user personas and their access privileges?",
+          "2. What are the key success metrics (KPIs) and data compliance rules?",
+          "3. Are there third-party API dependencies or specific payment gateways required?"
+        ]};
+        if (!data.questions) data.questions = data.questions_.map(q => ({question: q, type: "Core Requirements", difficulty: "High"}));
+        break;
+      case "/api/tools/doc-generate":
+        data = { markdown: `# ${payload.doc_type || "BRD"} - ${payload.project_name || "Sevenseed Project"}\n\n## 1. Executive Summary\nImplementing ${payload.project_name || "project"} leveraging the Sevenforce AI Workforce stack to automate workflow processes.\n\n## 2. Core Requirements & Flows\n- **User Intake**: Gated signup with session caching.\n- **Agent Routing**: Owl routes input to Maya/Nova agents.\n- **Data Layer**: SQLite transaction logging.\n\n*Generated in Static Preview Mode.*` };
+        break;
+      case "/api/download/docx":
+        data = { markdown: payload.markdown || "Mock document content for docx export." };
+        break;
+      case "/api/tools/test-cases":
+        data = { overall_score: 92, overall_recommendation: "Approved for deployment staging", scores: { "Syntax & Lints": 98, "Boundary Coverage": 90, "Security & Injection": 88 }, strengths: ["Complete validation of email structures", "Secure storage of session token"], areas_for_improvement: ["Implement rate-limit handling for API endpoints"] };
+        break;
+      case "/api/tools/figma-analyze":
+        data = { overall_score: 95, overall_recommendation: "Passes visual theme audit", scores: { "Contrast Ratio": 92, "Layout Grid Alignment": 98, "Font Scale Hierarchy": 95 }, strengths: ["Gorgeous dark theme implementation", "Perfect flex container nesting"], areas_for_improvement: ["Reduce transition blur-in delays to 600ms for responsiveness"] };
+        break;
+      case "/api/tools/summarize-transcript":
+        data = { summary: "The team aligned on the Sevenseed pages deployment. Kunal verified that routing issues are resolved.", key_points: ["Sevenforce UI redesigned completely.", "Auth gate and Settings modal are operational."], decisions: ["Point sub-venture Sevenseed links to repository root index.html."], action_items: [{ task: "Deploy updated sync routine to production branch", owner: "Kunal", due: "Immediate" }] };
+        break;
+      case "/api/tools/ask-data":
+        data = { summary: "Loaded 2,008 company listings and 1,837 HR contacts in Gujarat.", sql: "SELECT COUNT(*) FROM companies", rows: [{ "total_companies": 2008, "total_contacts": 1837 }] };
+        break;
+      default:
+        data = { reply: "Tool executed successfully (Static Preview Mode)." };
+    }
+    
+    if (tool.download) {
+      // Mock download file
+      const blob = new Blob([data.markdown || ""], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+      const url = URL.createObjectURL(blob);
+      const fn = (payload.project_name || "document") + "_" + (payload.doc_type || "doc") + ".docx";
+      bodyEl.innerHTML = `<a class="run" style="display:inline-block;text-decoration:none" href="${url}" download="${fn.replace(/[^A-Za-z0-9_.]/g, '_')}">⬇ Download ${fn} (Preview Mock)</a>`;
+    } else {
+      bodyEl.innerHTML = render(data);
+    }
+    btn.disabled = false;
+    btn.textContent = "Run";
+    return;
+  }
+
   // Construct headers
   const headers = { "Content-Type": "application/json" };
   const token = localStorage.getItem("sevenforce_token");
@@ -330,7 +430,14 @@ async function health(){
   // Add direct profile loader on page load
   (async function() {
     const token = localStorage.getItem('sevenforce_token');
+    const isOffline = localStorage.getItem('sevenforce_offline_mode') === '1';
+    
     if (token) {
+      if (isOffline) {
+        const mockName = localStorage.getItem('sevenforce_offline_username') || 'Preview User';
+        document.getElementById('user-display-name').textContent = mockName + ' (Preview)';
+        return;
+      }
       try {
         const res = await fetch('/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` }
@@ -346,6 +453,7 @@ async function health(){
     }
     // Fallback if token check failed
     localStorage.removeItem('sevenforce_token');
+    localStorage.removeItem('sevenforce_offline_mode');
     window.location.href = 'index.html';
   })();
 
